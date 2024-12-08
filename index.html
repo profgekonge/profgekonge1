@@ -1,261 +1,559 @@
 <html><head><base href="." />
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prof Gekonge</title>
-    <style>
-    :root {
-        --primary: #2d3436;
-        --secondary: #0984e3;
-        --accent: #00cec9;
-        --text: #2d3436;
-        --light: #dfe6e9;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prof Gekonge</title>
+<style>
+:root {
+    --primary: #2d3436;
+    --secondary: #0984e3;
+    --accent: #00cec9;
+    --text: #2d3436;
+    --light: #dfe6e9;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: var(--light);
+    color: var(--text);
+    line-height: 1.6;
+}
+
+.hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><rect width="800" height="600" fill="%231e1e1e"/><rect x="50" y="40" width="200" height="520" fill="%23252526"/><rect x="270" y="40" width="480" height="520" fill="%23252526"/><text x="290" y="80" fill="%239cdcfe" font-family="monospace" font-size="14">function greeting() {</text><text x="290" y="100" fill="%23ce9178" font-family="monospace" font-size="14">    return "Hello World!";</text><text x="290" y="120" fill="%239cdcfe" font-family="monospace" font-size="14">}</text></svg>');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(45, 52, 54, 0.8) 0%, rgba(9, 132, 227, 0.8) 100%);
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+    z-index: -1;
+}
+
+.content {
+    text-align: center;
+    color: white;
+    padding: 2rem;
+    animation: fadeIn 1s ease-in;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 15px;
+    backdrop-filter: blur(5px);
+    position: relative;
+    z-index: 1;
+}
+
+.floating-code {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.code-element {
+  position: absolute;
+  color: rgba(255, 255, 255, 0.1);
+  font-family: monospace;
+  font-size: 1.2rem;
+  white-space: nowrap;
+  animation: floatCode 15s linear infinite;
+}
+
+@keyframes floatCode {
+  0% {
+    transform: translateY(100vh) translateX(-50%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) translateX(50%);
+    opacity: 0;
+  }
+}
+
+.loader {
+    border: 5px solid var(--light);
+    border-radius: 50%;
+    border-top: 5px solid var(--accent);
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2000;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 3px solid var(--accent);
+    margin: 0 auto 1.5rem auto;
+    overflow: hidden;
+    position: relative;
+}
+
+.profile-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.profile-image:hover img {
+    transform: scale(1.1);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    animation: modalSlide 0.3s ease-out;
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--primary);
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.btn {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    background-color: #2ecc71; /* Fresh green color */
+    color: white;
+    box-shadow: 0 6px 0 #27ae60; /* Darker green for depth */
+    transform-style: preserve-3d;
+    transition: all 0.2s ease;
+    text-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    background: rgba(46, 204, 113, 0.2); /* Lighter green glow */
+    border-radius: 34px;
+    z-index: -1;
+    filter: blur(8px);
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 0 #27ae60;
+    background-color: #27ae60;
+}
+
+.btn:hover::before {
+    filter: blur(12px);
+}
+
+.btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #27ae60;
+}
+
+.submit-btn {
+    background-color: #2ecc71;
+    box-shadow: 0 6px 0 #27ae60;
+    color: white;
+    padding: 1rem;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    text-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 0 #27ae60;
+    background-color: #27ae60;
+}
+
+.submit-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #27ae60;
+}
+
+.table-control {
+  margin: 0 0.5rem;
+  padding: 0.5rem 1rem !important;
+  font-size: 0.9rem !important;
+  background-color: #2ecc71 !important;
+  box-shadow: 0 4px 0 #27ae60 !important;
+}
+
+.table-control:hover {
+    background-color: #27ae60 !important;
+}
+
+.table-control.active {
+    background-color: #27ae60 !important;
+    box-shadow: 0 2px 0 #219a52 !important;
+    transform: translateY(2px);
+}
+
+h1 {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+h1::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 3px;
+    background: var(--accent);
+}
+
+p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+#dynamicText {
+    transition: opacity 0.5s ease;
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.social-links {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.social-icon {
+    width: 40px;
+    height: 40px;
+    fill: white;
+    transition: transform 0.3s ease;
+}
+
+.social-icon:hover {
+    transform: scale(1.2);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-    
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'Poppins', sans-serif;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
-    
-    body {
-        background: var(--light);
-        color: var(--text);
-        line-height: 1.6;
+}
+
+@keyframes modalSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
     }
-    
-    .hero {
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        overflow: hidden;
-        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
-                    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><rect width="800" height="600" fill="%231e1e1e"/><rect x="50" y="40" width="200" height="520" fill="%23252526"/><rect x="270" y="40" width="480" height="520" fill="%23252526"/><text x="290" y="80" fill="%239cdcfe" font-family="monospace" font-size="14">function greeting() {</text><text x="290" y="100" fill="%23ce9178" font-family="monospace" font-size="14">    return "Hello World!";</text><text x="290" y="120" fill="%239cdcfe" font-family="monospace" font-size="14">}</text></svg>');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
-    
-    .hero::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(45deg, rgba(45, 52, 54, 0.8) 0%, rgba(9, 132, 227, 0.8) 100%);
-        clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
-        z-index: -1;
+}
+
+.projects-toggle-container {
+  margin-top: 1rem;
+}
+
+.projects-modal {
+  max-width: 90%;
+  width: 1200px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .projects-modal {
+    width: 95%;
+  }
+  
+  .projects-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+.projects-section {
+  display: none;
+}
+
+.projects-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.project-table {
+    perspective: 1000px;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.project-table.hidden {
+    display: none;
+}
+
+.project-table h2 {
+    background: var(--primary);
+    color: white;
+    padding: 1rem;
+    margin: 0;
+    text-align: center;
+}
+
+.project-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.project-table th,
+.project-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.project-table th {
+    background: var(--light);
+    font-weight: 600;
+}
+
+.project-table tr:hover {
+    background: #f5f5f5;
+}
+
+.project-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.status-in-progress {
+    background: #ffeaa7;
+    color: #b7791f;
+}
+
+.status-completed {
+    background: #c6f6d5;
+    color: #2f855a;
+}
+
+.project-table.flip-out {
+    animation: flipOut 0.3s ease-out forwards;
+}
+
+.project-table.flip-in {
+    animation: flipIn 0.3s ease-out forwards;
+}
+
+@keyframes flipOut {
+    0% {
+        transform: rotateX(0deg);
+        opacity: 1;
     }
-    
-    .content {
-        text-align: center;
-        color: white;
-        padding: 2rem;
-        animation: fadeIn 1s ease-in;
-        background: rgba(0, 0, 0, 0.4);
-        border-radius: 15px;
-        backdrop-filter: blur(5px);
+    100% {
+        transform: rotateX(-90deg);
+        opacity: 0;
     }
-    
-    .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
+}
+
+@keyframes flipIn {
+    0% {
+        transform: rotateX(90deg);
+        opacity: 0;
     }
-    
-    .modal.show {
-        display: flex;
+    100% {
+        transform: rotateX(0deg);
+        opacity: 1;
     }
+}
+
+.hover-green {
     
-    .modal-content {
-        background: white;
-        padding: 2rem;
-        border-radius: 15px;
-        width: 90%;
-        max-width: 500px;
-        position: relative;
-        animation: modalSlide 0.3s ease-out;
-    }
-    
-    .close-modal {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        font-size: 24px;
-        cursor: pointer;
-        color: var(--primary);
-    }
-    
-    .contact-form {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-    
-    .form-group label {
-        color: var(--primary);
-        font-weight: 600;
-    }
-    
-    .form-group input,
-    .form-group textarea {
-        padding: 0.8rem;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 1rem;
-    }
-    
-    .submit-btn {
-        background: var(--accent);
-        color: white;
-        padding: 1rem;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 1rem;
-        transition: transform 0.3s ease;
-    }
-    
-    .submit-btn:hover {
-        transform: translateY(-2px);
-    }
-    
-    h1 {
-        font-size: 3.5rem;
-        margin-bottom: 1rem;
-        position: relative;
-    }
-    
-    h1::after {
-        content: '';
-        position: absolute;
-        bottom: -10px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 50px;
-        height: 3px;
-        background: var(--accent);
-    }
-    
-    p {
-        font-size: 1.2rem;
-        margin-bottom: 2rem;
-    }
-    
-    .cta-buttons {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-    }
-    
-    .btn {
-        padding: 1rem 2rem;
-        border: none;
-        border-radius: 30px;
-        font-size: 1.1rem;
-        cursor: pointer;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        text-decoration: none;
-    }
-    
-    .btn-primary {
-        background: var(--accent);
-        color: var(--primary);
-    }
-    
-    .btn-secondary {
-        background: transparent;
-        border: 2px solid var(--light);
-        color: var(--light);
-    }
-    
-    .btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-    
-    .social-links {
-        margin-top: 2rem;
-        display: flex;
-        gap: 1.5rem;
-    }
-    
-    .social-icon {
-        width: 40px;
-        height: 40px;
-        fill: white;
-        transition: transform 0.3s ease;
-    }
-    
-    .social-icon:hover {
-        transform: scale(1.2);
-    }
-    
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    @keyframes modalSlide {
-        from {
-            opacity: 0;
-            transform: translateY(-50px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    @media (max-width: 768px) {
-        h1 {
-            font-size: 2.5rem;
-        }
-        
-        p {
-            font-size: 1rem;
-        }
-        
-        .cta-buttons {
-            flex-direction: column;
-        }
-    }
-    </style>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    </head>
-    <body>
-        <div class="hero">
-            <div class="content">
-                <h1>Fidelis Gekonge</h1>
-                <p>Creative Developer & Designer</p>
+    transition: color 0.3s ease; /* Smooth transition */
+}
+
+.hover-green:hover {
+    color: green; /* Color on hover */
+}
+
+.flex {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Aligns items vertically */
+    gap: 10px; /* Adds space between elements */
+    font-family: Arial, sans-serif; /* Sets the font */
+    font-size: 18px;
+}
+
+#dynamicText {
+    font-weight: bold; /* Makes the text bold */
+    color: #007BFF; /* Sets the text color */
+}
+
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Loader -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader"></div>
+    </div>
+
+    <div class="hero">
+        <div class="floating-code" id="floatingCode"></div>
+        <div class="content">
+            <div class="profile-image">
+                <img src="https://lh3.googleusercontent.com/pw/AP1GczOA1Ey6BgQK8b5OAWqBY1Evosp8xxNSpp8IZWmsxoInMuJ8c1-to2BNeqfZbtJQncgWAxxtswNP8sz7XdgoPWAzmSTfmehghRHQ5zS4cliteBLQFak=w2400" 
+                     alt="Fidelis Gekonge" 
+                     class="rotating-image">
+            </div>
+            
+            
+            <h1 class="hover-green">Prof Gekonge1</h1>
+            <div class="flex">
+                <p>I am a:</p></p><p id="dynamicText">Creative Developer</p>
+            </div>
+                
                 <div class="cta-buttons">
-                    <a href="https://sites.google.com/view/profgekonge1/home" class="btn btn-primary">View My Work</a>
+                    <a href="https://sites.google.com/view/profgekonge1/home" class="btn btn-primary">About Me</a>
                     <button class="btn btn-secondary" onclick="openModal()">Contact Me</button>
                 </div>
+            <div class="projects-toggle-container">
+                <button class="btn btn-secondary" onclick="toggleProjects()">View Projects</button>
+            </div>
                 <div class="social-links">
                     <!-- GitHub Icon -->
                     <a href="https://github.com/profgekonge">
@@ -276,66 +574,281 @@
                         </svg>
                     </a>
                 </div>
-            </div>
-              
         </div>
-    
-        <!-- Modal -->
-        <div class="modal" id="contactModal">
-            <div class="modal-content">
-                <span class="close-modal" onclick="closeModal()">&times;</span>
-                <h2 style="color: var(--primary); margin-bottom: 1.5rem;">Contact Me</h2>
-                <form class="contact-form" onsubmit="handleSubmit(event)">
-                    <div class="form-group">
-                        <label for="name">Name</label>
-                        <input type="text" id="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="message">Message</label>
-                        <textarea id="message" rows="5" required></textarea>
-                    </div>
-                    <button type="submit" class="submit-btn">Send Message</button>
-                </form>
+    </div>
+
+    <!-- Modal for Projects -->
+    <div class="modal" id="projectsModal">
+      <div class="modal-content projects-modal">
+        <span class="close-modal" onclick="closeProjectsModal()">&times;</span>
+        <div class="projects-container">
+          
+            <button class="btn btn-primary table-control" onclick="switchView('current')">Current Projects</button>
+            <button class="btn btn-primary table-control" onclick="switchView('deployed')">Deployed Projects</button>
+          </div>
+          <div class="projects-grid">
+            <!-- Current Projects Table -->
+            <div class="project-table">
+              <h2>Current Projects</h2>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Project Name</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody >
+                    <h1>In Progress</h1>
+                <!-- <tbody id="currentProjectsBody"> -->
+                  <!-- Projects will be loaded dynamically -->
+                </tbody>
+              </table>
             </div>
+
+            <!-- Deployed Projects Table -->
+            <div class="project-table">
+              <h2>Deployed Projects</h2>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Project Name</th>
+                    <th>Description</th>
+                    <th>Link</th>
+                  </tr>
+                </thead>
+                <tbody id="deployedProjectsBody">
+                    <h1>In Progress</h1>
+
+                <!-- <tbody id="deployedProjectsBody"> -->
+                  <!-- Projects will be loaded dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-    
-        <script>
-            function openModal() {
-                document.getElementById('contactModal').classList.add('show');
-            }
-    
-            function closeModal() {
-                document.getElementById('contactModal').classList.remove('show');
-            }
-    
-            function handleSubmit(event) {
-                event.preventDefault();
-                const name = document.getElementById('name').value;
-                const email = document.getElementById('email').value;
-                const message = document.getElementById('message').value;
-                
-                // Here you would typically send this data to a server
-                console.log('Form submitted:', { name, email, message });
-                
-                // Show success message
-                alert('Thank you for your message! I will get back to you soon.');
-                
-                // Close modal and reset form
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="contactModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 style="color: var(--primary); margin-bottom: 1.5rem;">Contact Me</h2>
+            <form action="https://formsubmit.co/fidgek2@email.com" method="POST">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" rows="5" required></textarea>
+                </div>
+                <button type="submit">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById('contactModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('contactModal').classList.remove('show');
+        }
+
+        function showLoader() {
+            document.getElementById('loaderOverlay').style.display = 'flex';
+        }
+
+        function hideLoader() {
+            document.getElementById('loaderOverlay').style.display = 'none';
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();
+            showLoader();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+            
+            // Simulate form submission
+            setTimeout(() => {
+                hideLoader();
+                alert('Thank you for your message!' + name + ' I will get back to you soon.');
                 closeModal();
                 event.target.reset();
-            }
-    
-            // Close modal if clicking outside
-            window.onclick = function(event) {
-                const modal = document.getElementById('contactModal');
-                if (event.target === modal) {
-                    closeModal();
+            }, 1500);
+        }
+
+        
+
+        function toggleProjects() {
+          document.getElementById('projectsModal').classList.add('show');
+          loadProjects();
+        }
+
+        function closeProjectsModal() {
+          document.getElementById('projectsModal').classList.remove('show');
+        }
+
+        function loadProjects() {
+          const currentProjectsBody = document.getElementById('currentProjectsBody');
+          const deployedProjectsBody = document.getElementById('deployedProjectsBody');
+          
+          currentProjectsBody.innerHTML = currentProjects.map(project => `
+            <tr>
+              <td>${project.name}</td>
+              <td>${project.description}</td>
+              <td><span class="project-status status-in-progress">${project.status}</span></td>
+            </tr>
+          `).join('');
+          
+          deployedProjectsBody.innerHTML = deployedProjects.map(project => `
+            <tr>
+              <td>${project.name}</td>
+              <td>${project.description}</td>
+              <td><a href="${project.link}" class="btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.9rem;">View Live</a></td>
+            </tr>
+          `).join('');
+        }
+
+        function initDynamicText() {
+          const phrases = [
+            "Creative Developer",
+            "Creative Designer",
+            "Data Analysit",
+            "Mathematician (Bsc. Applied Maths)",
+          ];
+          let currentIndex = 0;
+          const textElement = document.getElementById('dynamicText');
+          
+          setInterval(() => {
+            textElement.style.opacity = 0;
+            setTimeout(() => {
+              currentIndex = (currentIndex + 1) % phrases.length;
+              textElement.textContent = phrases[currentIndex];
+              textElement.style.opacity = 1;
+            }, 500);
+          }, 3000);
+        }
+
+        function switchView(view) {
+            const currentTable = document.querySelector('.project-table:nth-child(1)');
+            const deployedTable = document.querySelector('.project-table:nth-child(2)');
+            const controls = document.querySelectorAll('.table-control');
+            
+            controls.forEach(control => control.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Add flip out animation
+            [currentTable, deployedTable].forEach(table => {
+                if (table.style.display !== 'none') {
+                    table.classList.add('flip-out');
                 }
+            });
+            
+            // Wait for flip out animation to complete
+            setTimeout(() => {
+                switch(view) {
+                    case 'all':
+                        currentTable.style.display = 'block';
+                        deployedTable.style.display = 'block';
+                        break;
+                    case 'current':
+                        currentTable.style.display = 'block';
+                        deployedTable.style.display = 'none';
+                        break;
+                    case 'deployed':
+                        currentTable.style.display = 'none';
+                        deployedTable.style.display = 'block';
+                        break;
+                }
+                
+                // Add flip in animation
+                [currentTable, deployedTable].forEach(table => {
+                    if (table.style.display !== 'none') {
+                        table.classList.remove('flip-out');
+                        table.classList.add('flip-in');
+                        setTimeout(() => table.classList.remove('flip-in'), 300);
+                    }
+                });
+            }, 300);
+        }
+
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('loaderOverlay').style.display = 'none';
+                createFloatingCode();
+                initDynamicText(); // Initialize dynamic text
+            }, 1500);
+        });
+
+        // Close modal if clicking outside
+        window.onclick = function(event) {
+            const contactModal = document.getElementById('contactModal');
+            const projectsModal = document.getElementById('projectsModal');
+            if (event.target === contactModal) {
+                closeModal();
             }
-        </script>
-    </body>
-    </html>
+            if (event.target === projectsModal) {
+                closeProjectsModal();
+            }
+        }
+
+        function createFloatingCode() {
+            const codeSnippets = [
+                'function hello() { }',
+                'const data = [];',
+                'let x = 42;',
+                'if (true) { }',
+                'while (active) { }',
+                'class Component { }',
+                'export default app;',
+                'import React from "react";',
+                'const API_KEY = "*****";',
+                '<div className="">',
+                'addEventListener()',
+                'console.log("Debug");',
+                'npm install',
+                'git commit -m "fix"',
+                'docker build .',
+                'async/await',
+                'try { } catch { }',
+            ];
+
+            const container = document.getElementById('floatingCode');
+            
+            function createCodeElement() {
+                const element = document.createElement('div');
+                element.className = 'code-element';
+                element.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+                element.style.left = Math.random() * 100 + 'vw';
+                element.style.animationDuration = (10 + Math.random() * 15) + 's';
+                element.style.opacity = 0;
+                
+                container.appendChild(element);
+                
+                // Remove element after animation completes
+                setTimeout(() => {
+                    element.remove();
+                }, 25000);
+            }
+
+            // Create initial batch of elements
+            for (let i = 0; i < 10; i++) {
+                setTimeout(createCodeElement, i * 1000);
+            }
+
+            // Continue creating new elements periodically
+            setInterval(createCodeElement, 2000);
+        }
+    </script>
+</body>
+</html>

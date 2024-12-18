@@ -1,0 +1,686 @@
+<html><head><base href="/">
+    <title>Soccer Team Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <style>
+    .team-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 10px;
+        background: #f8f9fa;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .comparison-section {
+        margin: 20px 0;
+        padding: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .stats-chart {
+        max-width: 600px;
+        margin: 20px auto;
+    }
+    .loading {
+        display: none;
+        text-align: center;
+        padding: 20px;
+    }
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .autocomplete-items {
+        position: absolute;
+        border: 1px solid #ddd;
+        border-top: none;
+        z-index: 99;
+        width: calc(100% - 24px);
+        max-height: 150px;
+        overflow-y: auto;
+        background: white;
+    }
+    .autocomplete-items div {
+        padding: 10px;
+        cursor: pointer;
+    }
+    .autocomplete-items div:hover {
+        background-color: #e9e9e9;
+    }
+    .autocomplete-active {
+        background-color: DodgerBlue !important;
+        color: #ffffff;
+    }
+    #results {
+        display: none;
+    }
+    .recent-matches {
+        margin-top: 15px;
+    }
+    .match-item {
+        padding: 10px;
+        margin-bottom: 8px;
+        border-radius: 4px;
+        background: #fff;
+        border: 1px solid #eee;
+    }
+    .match-result-win {
+        border-left: 4px solid #28a745;
+    }
+    .match-result-loss {
+        border-left: 4px solid #dc3545;
+    }
+    .match-result-draw {
+        border-left: 4px solid #ffc107;
+    }
+    .match-date {
+        color: #666;
+        font-size: 0.9em;
+    }
+    .progress {
+        border-radius: 5px;
+    }
+    .progress-bar {
+        transition: width 0.6s ease;
+        min-width: 20px;
+    }
+    #extended-prediction .card {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+    }
+    #extended-prediction .list-group-item {
+        background-color: #ffffff;
+    }
+    </style>
+    </head>
+    <body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Soccer Team Analysis</h1>
+        
+        <div class="row mb-4">
+            <div class="col-md-6 position-relative">
+                <input type="text" id="team1" class="form-control" placeholder="Enter first team name" autocomplete="off">
+                <div id="team1-autocomplete" class="autocomplete-items"></div>
+            </div>
+            <div class="col-md-6 position-relative">
+                <input type="text" id="team2" class="form-control" placeholder="Enter second team name" autocomplete="off">
+                <div id="team2-autocomplete" class="autocomplete-items"></div>
+            </div>
+        </div>
+        
+        <div class="text-center">
+            <button class="btn btn-primary me-2" onclick="analyzeTeams()">Analyze Teams</button>
+            <button class="btn btn-secondary" onclick="resetAnalysis()">Reset</button>
+        </div>
+    
+        <div id="loading" class="loading">
+            <div class="loading-spinner"></div>
+            <p>Analyzing teams...</p>
+        </div>
+    
+        <div id="results" class="mt-4">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="comparison-section">
+                        <h3 class="text-center">Head-to-Head History</h3>
+                        <div id="head-to-head-matches" class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Home Team</th>
+                                        <th>Score</th>
+                                        <th>Away Team</th>
+                                        <th>Competition</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="head-to-head-tbody">
+                                </tbody>
+                            </table>
+                            <nav aria-label="Head-to-head matches pagination">
+                                <ul class="pagination justify-content-center" id="pagination">
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="comparison-section">
+                        <h3 class="text-center">Match Prediction</h3>
+                        <div id="prediction"></div>
+                        <div id="extended-prediction" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="team-card" id="team1-info"></div>
+                </div>
+                <div class="col-md-6">
+                    <div class="team-card" id="team2-info"></div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="team-card">
+                        <h4 id="team1-matches-title"></h4>
+                        <div id="team1-matches" class="recent-matches"></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="team-card">
+                        <h4 id="team2-matches-title"></h4>
+                        <div id="team2-matches" class="recent-matches"></div>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="comparison-section">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h3 class="text-center">Head-to-Head Comparison</h3>
+                                <canvas id="comparisonChart"></canvas>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="key-stats">
+                                    <h5 class="mt-4">Likely Scorers</h5>
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div id="likely-scorers"></div>
+                                        </div>
+                                    </div>
+    
+                                    <h5 class="mt-4">Key Match Factors</h5>
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div id="key-match-factors"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+        </div>
+    </div>
+    
+    <script>
+    const MATCHES_PER_PAGE = 5;
+    let currentPage = 1;
+    let allHeadToHeadMatches = [];
+    
+    const API_KEY = 'X-AUTH-TOKEN';
+    const BASE_URL = 'https://api.football-data.org/v2';
+    
+    const sampleTeams = [
+        "Arsenal", "Chelsea", "Liverpool", "Manchester City", "Manchester United",
+        "Tottenham", "Barcelona", "Real Madrid", "Atletico Madrid", "Bayern Munich",
+        "Borussia Dortmund", "Paris Saint-Germain", "Juventus", "AC Milan", "Inter Milan",
+        "Ajax", "Porto", "Benfica", "Celtic", "Rangers"
+    ];
+    
+    function resetAnalysis() {
+        document.getElementById('team1').value = '';
+        document.getElementById('team2').value = '';
+        document.getElementById('results').style.display = 'none';
+        document.getElementById('team1-info').innerHTML = '';
+        document.getElementById('team2-info').innerHTML = '';
+        document.getElementById('team1-matches').innerHTML = '';
+        document.getElementById('team2-matches').innerHTML = '';
+        document.getElementById('prediction').innerHTML = '';
+        document.getElementById('head-to-head-tbody').innerHTML = '';
+        
+        if (window.comparisonChart instanceof Chart) {
+            window.comparisonChart.destroy();
+            window.comparisonChart = null;
+        }
+    
+        currentPage = 1;
+        allHeadToHeadMatches = [];
+        document.getElementById('pagination').innerHTML = '';
+    }
+    
+    function setupAutocomplete(inputId, autocompleteId) {
+        const input = document.getElementById(inputId);
+        const autocompleteDiv = document.getElementById(autocompleteId);
+        
+        input.addEventListener('input', function() {
+            const value = this.value.toLowerCase();
+            autocompleteDiv.innerHTML = '';
+            
+            if (value.length < 2) return;
+            
+            const matches = sampleTeams.filter(team => 
+                team.toLowerCase().includes(value)
+            );
+            
+            matches.forEach(team => {
+                const div = document.createElement('div');
+                div.textContent = team;
+                div.addEventListener('click', function() {
+                    input.value = team;
+                    autocompleteDiv.innerHTML = '';
+                });
+                autocompleteDiv.appendChild(div);
+            });
+        });
+        
+        document.addEventListener('click', function(e) {
+            if (e.target !== input) {
+                autocompleteDiv.innerHTML = '';
+            }
+        });
+    }
+    
+    setupAutocomplete('team1', 'team1-autocomplete');
+    setupAutocomplete('team2', 'team2-autocomplete');
+    
+    async function analyzeTeams() {
+        const team1Name = document.getElementById('team1').value;
+        const team2Name = document.getElementById('team2').value;
+        
+        if (!team1Name || !team2Name) {
+            alert('Please enter both team names');
+            return;
+        }
+    
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('results').style.display = 'none';
+        
+        try {
+            const team1Data = await simulateTeamData(team1Name);
+            const team2Data = await simulateTeamData(team2Name);
+            
+            displayTeamInfo(team1Data, 'team1-info');
+            displayTeamInfo(team2Data, 'team2-info');
+            document.getElementById('team1-matches-title').innerText = `${team1Data.name} Recent Matches`;
+            document.getElementById('team2-matches-title').innerText = `${team2Data.name} Recent Matches`;
+            displayRecentMatches(team1Data.name, team1Data.recentMatches, 'team1-matches');
+            displayRecentMatches(team2Data.name, team2Data.recentMatches, 'team2-matches');
+            createComparisonChart(team1Data, team2Data);
+            generatePrediction(team1Data, team2Data);
+            displayHeadToHeadMatches(team1Name, team2Name);
+            
+            document.getElementById('results').style.display = 'block';
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error analyzing teams');
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+    
+    function simulateRecentMatches() {
+        const opponents = [
+            "Liverpool", "Chelsea", "Arsenal", "Manchester City", 
+            "Tottenham", "Leicester", "Everton", "West Ham"
+        ];
+        
+        const matches = [];
+        for(let i = 0; i < 5; i++) {
+            const randomOpponent = opponents[Math.floor(Math.random() * opponents.length)];
+            const homeGoals = Math.floor(Math.random() * 4);
+            const awayGoals = Math.floor(Math.random() * 4);
+            const daysAgo = i * 7 + Math.floor(Math.random() * 3);
+            const date = new Date();
+            date.setDate(date.getDate() - daysAgo);
+            
+            matches.push({
+                opponent: randomOpponent,
+                homeGoals: homeGoals,
+                awayGoals: awayGoals,
+                date: date,
+                isHome: Math.random() > 0.5
+            });
+        }
+        return matches;
+    }
+    
+    function displayRecentMatches(teamName, matches, elementId) {
+        const element = document.getElementById(elementId);
+        let html = '';
+        
+        matches.forEach(match => {
+            const isWin = match.isHome ? 
+                match.homeGoals > match.awayGoals : 
+                match.awayGoals > match.homeGoals;
+            const isDraw = match.homeGoals === match.awayGoals;
+            const resultClass = isWin ? 'match-result-win' : 
+                              isDraw ? 'match-result-draw' : 
+                              'match-result-loss';
+            
+            const score = match.isHome ? 
+                `${match.homeGoals} - ${match.awayGoals}` :
+                `${match.awayGoals} - ${match.homeGoals}`;
+                
+            const opponent = match.isHome ? 
+                `${teamName} vs ${match.opponent}` :
+                `${match.opponent} vs ${teamName}`;
+                
+            html += `
+                <div class="match-item ${resultClass}">
+                    <div class="match-date">${match.date.toLocaleDateString()}</div>
+                    <div>${opponent}</div>
+                    <div><strong>${score}</strong></div>
+                </div>
+            `;
+        });
+        
+        element.innerHTML = html;
+    }
+    
+    function simulateTeamData(teamName) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve({
+                    name: teamName,
+                    recentForm: Math.floor(Math.random() * 100),
+                    attackStrength: Math.floor(Math.random() * 100),
+                    defenseStrength: Math.floor(Math.random() * 100),
+                    possession: Math.floor(Math.random() * 100),
+                    wins: Math.floor(Math.random() * 15),
+                    draws: Math.floor(Math.random() * 10),
+                    losses: Math.floor(Math.random() * 15),
+                    recentMatches: simulateRecentMatches()
+                });
+            }, 1000);
+        });
+    }
+    
+    function displayTeamInfo(teamData, elementId) {
+        const element = document.getElementById(elementId);
+        element.innerHTML = `
+            <h4>${teamData.name}</h4>
+            <p><strong>Recent Form:</strong> ${teamData.recentForm}%</p>
+            <p><strong>Attack Strength:</strong> ${teamData.attackStrength}%</p>
+            <p><strong>Defense Strength:</strong> ${teamData.defenseStrength}%</p>
+            <p><strong>Average Possession:</strong> ${teamData.possession}%</p>
+            <p><strong>Season Record:</strong> ${teamData.wins}W ${teamData.draws}D ${teamData.losses}L</p>
+        `;
+    }
+    
+    function createComparisonChart(team1Data, team2Data) {
+        const ctx = document.getElementById('comparisonChart').getContext('2d');
+        
+        if (window.comparisonChart instanceof Chart) {
+            window.comparisonChart.destroy();
+            window.comparisonChart = null;
+        }
+        
+        window.comparisonChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['Recent Form', 'Attack', 'Defense', 'Possession'],
+                datasets: [
+                    {
+                        label: team1Data.name,
+                        data: [team1Data.recentForm, team1Data.attackStrength, team1Data.defenseStrength, team1Data.possession],
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgb(54, 162, 235)',
+                        pointBackgroundColor: 'rgb(54, 162, 235)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(54, 162, 235)'
+                    },
+                    {
+                        label: team2Data.name,
+                        data: [team2Data.recentForm, team2Data.attackStrength, team2Data.defenseStrength, team2Data.possession],
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        pointBackgroundColor: 'rgb(255, 99, 132)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(255, 99, 132)'
+                    }
+                ]
+            },
+            options: {
+                elements: {
+                    line: {
+                        borderWidth: 3
+                    }
+                },
+                scales: {
+                    r: {
+                        angleLines: {
+                            display: true
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 100
+                    }
+                }
+            }
+        });
+    }
+    
+    function generatePrediction(team1Data, team2Data) {
+        const team1Score = calculateTeamScore(team1Data);
+        const team2Score = calculateTeamScore(team2Data);
+        
+        const predictedScore1 = Math.floor(team1Score / 20);
+        const predictedScore2 = Math.floor(team2Score / 20);
+        
+        // Calculate win probabilities
+        const totalScore = team1Score + team2Score;
+        const team1WinProb = Math.round((team1Score / totalScore) * 100);
+        const team2WinProb = Math.round((team2Score / totalScore) * 100);
+        const drawProb = 100 - team1WinProb - team2WinProb;
+        
+        // Simulate likely scorers
+        const likelyScorers = generateLikelyScorers(team1Data.name, team2Data.name);
+        
+        const predictionElement = document.getElementById('prediction');
+        predictionElement.innerHTML = `
+            <div class="text-center">
+                <h4>Predicted Score</h4>
+                <p class="h3">${team1Data.name} ${predictedScore1} - ${predictedScore2} ${team2Data.name}</p>
+                <p class="mt-3">${generateMatchAnalysis(team1Data, team2Data)}</p>
+            </div>
+            
+            <div class="mt-4">
+                <h5>Win Probability</h5>
+                <div class="progress mb-2" style="height: 25px;">
+                    <div class="progress-bar bg-success" style="width: ${team1WinProb}%" 
+                        title="${team1Data.name}">
+                        ${team1Data.name}: ${team1WinProb}%
+                    </div>
+                    <div class="progress-bar bg-warning" style="width: ${drawProb}%">
+                        Draw: ${drawProb}%
+                    </div>
+                    <div class="progress-bar bg-danger" style="width: ${team2WinProb}%"
+                        title="${team2Data.name}">
+                        ${team2Data.name}: ${team2WinProb}%
+                    </div>
+                </div>
+            </div>
+        `;
+    
+        // Update likely scorers section
+        document.getElementById('likely-scorers').innerHTML = `
+            <p><strong>${team1Data.name}:</strong> ${likelyScorers.team1.join(', ')}</p>
+            <p><strong>${team2Data.name}:</strong> ${likelyScorers.team2.join(', ')}</p>
+        `;
+    
+        // Update key match factors section
+        document.getElementById('key-match-factors').innerHTML = `
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <strong>Form:</strong> ${compareFormAnalysis(team1Data, team2Data)}
+                </li>
+                <li class="list-group-item">
+                    <strong>Attack:</strong> ${compareAttackAnalysis(team1Data, team2Data)}
+                </li>
+                <li class="list-group-item">
+                    <strong>Defense:</strong> ${compareDefenseAnalysis(team1Data, team2Data)}
+                </li>
+            </ul>
+        `;
+    }
+    
+    function calculateTeamScore(teamData) {
+        return (teamData.recentForm + teamData.attackStrength + teamData.defenseStrength + teamData.possession) / 4;
+    }
+    
+    function generateMatchAnalysis(team1Data, team2Data) {
+        const team1Score = calculateTeamScore(team1Data);
+        const team2Score = calculateTeamScore(team2Data);
+        
+        if (Math.abs(team1Score - team2Score) < 10) {
+            return "This match looks to be very closely contested with both teams evenly matched.";
+        } else if (team1Score > team2Score) {
+            return `${team1Data.name} appears to have a slight advantage based on recent form and team statistics.`;
+        } else {
+            return `${team2Data.name} appears to have a slight advantage based on recent form and team statistics.`;
+        }
+    }
+    
+    function generateLikelyScorers(team1Name, team2Name) {
+        // Simulate some player names for each team
+        const team1Players = [
+            `${team1Name} Striker 1`,
+            `${team1Name} Midfielder 1`,
+            `${team1Name} Forward 1`
+        ];
+        
+        const team2Players = [
+            `${team2Name} Striker 1`,
+            `${team2Name} Midfielder 1`,
+            `${team2Name} Forward 1`
+        ];
+        
+        return {
+            team1: team1Players,
+            team2: team2Players
+        };
+    }
+    
+    function compareFormAnalysis(team1Data, team2Data) {
+        if (team1Data.recentForm > team2Data.recentForm) {
+            return `${team1Data.name} has shown better recent form`;
+        } else if (team2Data.recentForm > team1Data.recentForm) {
+            return `${team2Data.name} has shown better recent form`;
+        }
+        return 'Both teams are showing similar form';
+    }
+    
+    function compareAttackAnalysis(team1Data, team2Data) {
+        if (team1Data.attackStrength > team2Data.attackStrength) {
+            return `${team1Data.name} has stronger attacking statistics`;
+        } else if (team2Data.attackStrength > team1Data.attackStrength) {
+            return `${team2Data.name} has stronger attacking statistics`;
+        }
+        return 'Both teams have similar attacking strength';
+    }
+    
+    function compareDefenseAnalysis(team1Data, team2Data) {
+        if (team1Data.defenseStrength > team2Data.defenseStrength) {
+            return `${team1Data.name} has better defensive record`;
+        } else if (team2Data.defenseStrength > team1Data.defenseStrength) {
+            return `${team2Data.name} has better defensive record`;
+        }
+        return 'Both teams have similar defensive capabilities';
+    }
+    
+    function simulateHeadToHeadMatches(team1Name, team2Name) {
+        const matches = [];
+        for(let i = 0; i < 20; i++) {
+            const daysAgo = i * 30 + Math.floor(Math.random() * 30);
+            const date = new Date();
+            date.setDate(date.getDate() - daysAgo);
+            
+            const homeTeam = Math.random() > 0.5 ? team1Name : team2Name;
+            const awayTeam = homeTeam === team1Name ? team2Name : team1Name;
+            const homeGoals = Math.floor(Math.random() * 4);
+            const awayGoals = Math.floor(Math.random() * 4);
+            
+            const competitions = ["Premier League", "FA Cup", "Champions League", "League Cup"];
+            const competition = competitions[Math.floor(Math.random() * competitions.length)];
+            
+            matches.push({
+                date: date,
+                homeTeam: homeTeam,
+                awayTeam: awayTeam,
+                homeGoals: homeGoals,
+                awayGoals: awayGoals,
+                competition: competition
+            });
+        }
+        return matches.sort((a, b) => b.date - a.date);
+    }
+    
+    function displayPagination(totalMatches) {
+        const totalPages = Math.ceil(totalMatches / MATCHES_PER_PAGE);
+        const paginationElement = document.getElementById('pagination');
+        paginationElement.innerHTML = '';
+        
+        // Previous button
+        const prevLi = document.createElement('li');
+        prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+        prevLi.innerHTML = `<a class="page-link" href="javascript:void(0)" onclick="changePage(${currentPage - 1})">Previous</a>`;
+        paginationElement.appendChild(prevLi);
+        
+        // Page numbers
+        for (let i = 1; i <= totalPages; i++) {
+            const li = document.createElement('li');
+            li.className = `page-item ${currentPage === i ? 'active' : ''}`;
+            li.innerHTML = `<a class="page-link" href="javascript:void(0)" onclick="changePage(${i})">${i}</a>`;
+            paginationElement.appendChild(li);
+        }
+        
+        // Next button
+        const nextLi = document.createElement('li');
+        nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+        nextLi.innerHTML = `<a class="page-link" href="javascript:void(0)" onclick="changePage(${currentPage + 1})">Next</a>`;
+        paginationElement.appendChild(nextLi);
+    }
+    
+    function changePage(page) {
+        if (page < 1 || page > Math.ceil(allHeadToHeadMatches.length / MATCHES_PER_PAGE)) return;
+        currentPage = page;
+        displayHeadToHeadMatches(allHeadToHeadMatches[0].homeTeam, allHeadToHeadMatches[0].awayTeam);
+    }
+    
+    // Modify the displayHeadToHeadMatches function
+    function displayHeadToHeadMatches(team1Name, team2Name) {
+        if (allHeadToHeadMatches.length === 0) {
+            allHeadToHeadMatches = simulateHeadToHeadMatches(team1Name, team2Name);
+        }
+        
+        const tbody = document.getElementById('head-to-head-tbody');
+        tbody.innerHTML = '';
+        
+        const start = (currentPage - 1) * MATCHES_PER_PAGE;
+        const end = start + MATCHES_PER_PAGE;
+        const paginatedMatches = allHeadToHeadMatches.slice(start, end);
+        
+        paginatedMatches.forEach(match => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${match.date.toLocaleDateString()}</td>
+                <td>${match.homeTeam}</td>
+                <td class="fw-bold">${match.homeGoals} - ${match.awayGoals}</td>
+                <td>${match.awayTeam}</td>
+                <td>${match.competition}</td>
+            `;
+            tbody.appendChild(row);
+        });
+        
+        displayPagination(allHeadToHeadMatches.length);
+    }
+    </script>
+    </body></html>

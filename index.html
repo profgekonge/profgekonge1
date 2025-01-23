@@ -677,7 +677,7 @@ p {
                 },
                 callback: function(response){
                     alert('Payment complete! Reference: ' + response.reference);
-                    // Add verification API call here
+                    window.location.href = "/success-page.html?reference=" + response.reference;
                 }
             });
 

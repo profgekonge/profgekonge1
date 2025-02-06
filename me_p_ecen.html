@@ -1,0 +1,444 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ECEN - Empowering Communities</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#d500ff',
+            secondary: '#e066ff'
+          },
+          animation: {
+            'fade-in-up': 'fadeInUp 1s ease-in-out',
+            'float': 'float 3s ease-in-out infinite',
+            'fade': 'fade 0.5s ease-in-out',
+            'slide-left': 'slideLeft 25s linear infinite',
+            'zoom': 'zoomEffect 10s ease-in-out infinite alternate',
+            'slideDown': 'slideDown 1s ease-out',
+            'slideUp': 'slideUp 1s ease-out'
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': {
+                opacity: '0',
+                transform: 'translateY(20px)'
+              },
+              '100%': {
+                opacity: '1',
+                transform: 'translateY(0)'
+              }
+            },
+            float: {
+              '0%, 100%': {
+                transform: 'translateY(0)'
+              },
+              '50%': {
+                transform: 'translateY(-10px)'
+              }
+            },
+            fade: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' }
+            },
+            slideLeft: {
+              '0%': { transform: 'translateX(100%)' },
+              '100%': { transform: 'translateX(-100%)' }
+            },
+            zoomEffect: {
+              '0%': { transform: 'scale(1)' },
+              '100%': { transform: 'scale(1.05)' }
+            },
+            slideDown: {
+              '0%': { transform: 'translateY(-30px)', opacity: '0' },
+              '100%': { transform: 'translateY(0)', opacity: '1' }
+            },
+            slideUp: {
+              '0%': { transform: 'translateY(30px)', opacity: '0' },
+              '100%': { transform: 'translateY(0)', opacity: '1' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Carousel Styles */
+    .carousel-item {
+      height: 90vh;
+      min-height: 400px;
+      background-size: cover;
+      background-position: center;
+      display: none;
+      position: relative;
+      overflow: hidden;
+    }
+    .carousel-item.active {
+      display: block;
+      animation: fade 0.5s ease-in-out;
+    }
+    .gradient-overlay {
+      background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+    }
+    /* Sliced Reveal Effect */
+    .slices-container {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      pointer-events: none;
+      z-index: 3;
+    }
+    .slice {
+      flex: 1;
+      background: #000;
+      transform-origin: top;
+      animation: sliceReveal 1s forwards;
+    }
+    /* Stagger delays for each slice */
+    .slices-container .slice:nth-child(1) { animation-delay: 0.2s; }
+    .slices-container .slice:nth-child(2) { animation-delay: 0.4s; }
+    .slices-container .slice:nth-child(3) { animation-delay: 0.6s; }
+    .slices-container .slice:nth-child(4) { animation-delay: 0.8s; }
+    .slices-container .slice:nth-child(5) { animation-delay: 1s; }
+    @keyframes sliceReveal {
+      0% { transform: scaleY(1); }
+      100% { transform: scaleY(0); }
+    }
+    /* Additional styles (value cards, focus areas, etc.) remain unchanged */
+    .value-card {
+      position: relative;
+      height: 400px;
+      overflow: hidden;
+      border-radius: 1rem;
+    }
+    .value-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.9));
+      z-index: 1;
+    }
+    .value-card-content {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .value-card-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-size: cover;
+      background-position: center;
+      transition: transform 0.3s ease;
+    }
+    .value-card:hover .value-card-bg {
+      transform: scale(1.1);
+    }
+    .focus-card {
+      background: rgba(213, 0, 255, 0.05);
+      border-left: 4px solid #d500ff;
+      transition: all 0.3s ease;
+    }
+    .focus-card:hover {
+      background: rgba(213, 0, 255, 0.1);
+      transform: translateX(10px);
+    }
+    .animate-pause-hover:hover {
+      animation-play-state: paused;
+    }
+    .focus-container {
+      overflow: hidden;
+      position: relative;
+    }
+    .focus-scroll {
+      display: flex;
+      gap: 2rem;
+      padding: 2rem 0;
+    }
+    .focus-item {
+      flex: 0 0 auto;
+      width: 600px;
+    }
+  </style>
+</head>
+<body class="font-sans text-gray-800">
+
+  <!-- Navigation (Header floats in from above) -->
+  <nav class="bg-primary sticky top-0 z-50 animate-slideDown">
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-center h-16">
+        <a href="#" class="text-white text-2xl font-bold">ECEN</a>
+        <div class="hidden md:flex space-x-8">
+          <a href="#Home" class="text-white hover:text-purple-200 transition">Home</a>
+          <a href="#mission" class="text-white hover:text-purple-200 transition">Mission</a>
+          <a href="#values" class="text-white hover:text-purple-200 transition">Core Values</a>
+          <a href="#focus" class="text-white hover:text-purple-200 transition">Focus Areas</a>
+          <a href="#contact" class="text-white hover:text-purple-200 transition">Contact</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section with Carousel -->
+  <div id="heroCarousel" class="relative">
+    <!-- Slide 1 -->
+    <div class="carousel-item active animate-zoom" style="background-image: url('https://images.pexels.com/photos/6646917/pexels-photo-6646917.jpeg?auto=compress&cs=tinysrgb&w=1600');">
+      <!-- Sliced Overlay (simultaneous with text animation) -->
+      <div class="slices-container">
+        <div class="slice"></div>
+        <div class="slice"></div>
+        <div class="slice"></div>
+        <div class="slice"></div>
+        <div class="slice"></div>
+      </div>
+      <div class="gradient-overlay absolute inset-0"></div>
+      <div class="absolute inset-0 flex items-center justify-start">
+        <div class="max-w-2xl px-12 ml-12">
+          <h1 class="text-5xl md:text-6xl font-bold text-white mb-6 animate-slideDown">Empowering Communities</h1>
+          <p class="text-xl md:text-2xl text-white mb-8 animate-slideUp">Fostering social change through education, advocacy, and capacity building.</p>
+          <div class="space-x-4">
+            <a href="#mission" class="bg-primary hover:bg-secondary text-white font-bold py-3 px-8 rounded-full transition">Learn More</a>
+            <a href="#contact" class="border-2 border-white text-white hover:bg-white hover:text-primary font-bold py-3 px-8 rounded-full transition">Contact Us</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Slide 2 -->
+    <div class="carousel-item animate-zoom" style="background-image: url('https://images.pexels.com/photos/8199562/pexels-photo-8199562.jpeg?auto=compress&cs=tinysrgb&w=1600');">
+      <div class="slices-container">
+        <div class="slice"></div>
+        <div class="slice"></div>
+        <div class="slice"></div>
+        <div class="slice"></div>
+        <div class="slice"></div>
+      </div>
+      <div class="gradient-overlay absolute inset-0"></div>
+      <div class="absolute inset-0 flex items-center justify-start">
+        <div class="max-w-2xl px-12 ml-12">
+          <h1 class="text-5xl md:text-6xl font-bold text-white mb-6 animate-slideDown">Advocating for Equality</h1>
+          <p class="text-xl md:text-2xl text-white mb-8 animate-slideUp">Championing human rights and social justice across communities.</p>
+          <div class="space-x-4">
+            <a href="#values" class="bg-primary hover:bg-secondary text-white font-bold py-3 px-8 rounded-full transition">Our Values</a>
+            <a href="#contact" class="border-2 border-white text-white hover:bg-white hover:text-primary font-bold py-3 px-8 rounded-full transition">Get Involved</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Slide 3 -->
+    <div class="carousel-item animate-zoom" style="background-image: url('https://images.pexels.com/photos/6249440/pexels-photo-6249440.jpeg?auto=compress&cs=tinysrgb&w=1600');">
+      <div class="slices-container">
+        <div class="slice"></div>
+        <div class="slice"></div>
+        <div class="slice"></div>
+        <div class="slice"></div>
+        <div class="slice"></div>
+      </div>
+      <div class="gradient-overlay absolute inset-0"></div>
+      <div class="absolute inset-0 flex items-center justify-start">
+        <div class="max-w-2xl px-12 ml-12">
+          <h1 class="text-5xl md:text-6xl font-bold text-white mb-6 animate-slideDown">Driving Sustainable Change</h1>
+          <p class="text-xl md:text-2xl text-white mb-8 animate-slideUp">Building a future where every voice is heard and every right is protected.</p>
+          <div class="space-x-4">
+            <a href="#focus" class="bg-primary hover:bg-secondary text-white font-bold py-3 px-8 rounded-full transition">Our Focus</a>
+            <a href="#contact" class="border-2 border-white text-white hover:bg-white hover:text-primary font-bold py-3 px-8 rounded-full transition">Support Us</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Carousel Controls -->
+    <button class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75" onclick="previousSlide()">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+    </button>
+    <button class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75" onclick="nextSlide()">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mission Section -->
+  <section id="mission" class="py-20">
+    <div class="container mx-auto px-4">
+      <h2 class="text-4xl font-bold text-primary text-center mb-10">Our Mission</h2>
+      <div class="max-w-3xl mx-auto text-center">
+        <p class="text-xl leading-relaxed">
+          The Elgon Centre for Empowerment Network (ECEN) is committed to empowering marginalized and underserved communities through education, advocacy, and capacity-building. We strive to create lasting social change, foster equality, and drive sustainable development.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Values Section -->
+  <section id="values" class="bg-gray-50 py-20">
+    <div class="container mx-auto px-4">
+      <h2 class="text-4xl font-bold text-primary text-center mb-16">Our Core Values</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        
+        <!-- Gender Sensitivity -->
+        <div class="value-card animate-float">
+          <div class="value-card-bg" style="background-image: url('https://images.pexels.com/photos/7551442/pexels-photo-7551442.jpeg?auto=compress&cs=tinysrgb&w=1600')"></div>
+          <div class="value-card-content">
+            <h3 class="text-2xl font-bold text-white mb-4">Gender Sensitivity</h3>
+            <p class="text-gray-200">ECEN upholds the principle of gender sensitivity in all of its programs, recognizing that gender inequality often hinders progress. We ensure our initiatives address the specific needs of women, girls, and other gender minorities.</p>
+          </div>
+        </div>
+
+        <!-- Equality and Justice -->
+        <div class="value-card animate-float">
+          <div class="value-card-bg" style="background-image: url('https://images.pexels.com/photos/7662511/pexels-photo-7662511.jpeg?auto=compress&cs=tinysrgb&w=1600')"></div>
+          <div class="value-card-content">
+            <h3 class="text-2xl font-bold text-white mb-4">Equality and Justice</h3>
+            <p class="text-gray-200">At the heart of ECEN's mission is the promotion of equality and social justice. We are committed to addressing systemic inequities and ensuring fundamental rights for all.</p>
+          </div>
+        </div>
+
+        <!-- Partnership and Collaboration -->
+        <div class="value-card animate-float">
+          <div class="value-card-bg" style="background-image: url('https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1600')"></div>
+          <div class="value-card-content">
+            <h3 class="text-2xl font-bold text-white mb-4">Partnership and Collaboration</h3>
+            <p class="text-gray-200">We recognize that sustainable change is achieved through collective action, collaborating with communities, government agencies, and international organizations.</p>
+          </div>
+        </div>
+
+        <!-- Respect for Women's Rights -->
+        <div class="value-card animate-float">
+          <div class="value-card-bg" style="background-image: url('https://images.pexels.com/photos/7551670/pexels-photo-7551670.jpeg?auto=compress&cs=tinysrgb&w=1600')"></div>
+          <div class="value-card-content">
+            <h3 class="text-2xl font-bold text-white mb-4">Respect for Women's Rights</h3>
+            <p class="text-gray-200">ECEN advocates for women's rights and believes that achieving gender equality is central to societal well-being, promoting protection and advancement in all spheres of life.</p>
+          </div>
+        </div>
+
+        <!-- Integrity -->
+        <div class="value-card animate-float">
+          <div class="value-card-bg" style="background-image: url('https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=1600')"></div>
+          <div class="value-card-content">
+            <h3 class="text-2xl font-bold text-white mb-4">Integrity</h3>
+            <p class="text-gray-200">Integrity is our cornerstone. We maintain transparency, honesty, and accountability in all actions, adhering to high ethical standards in our dealings.</p>
+          </div>
+        </div>
+
+        <!-- Professionalism -->
+        <div class="value-card animate-float">
+          <div class="value-card-bg" style="background-image: url('https://images.pexels.com/photos/3184306/pexels-photo-3184306.jpeg?auto=compress&cs=tinysrgb&w=1600')"></div>
+          <div class="value-card-content">
+            <h3 class="text-2xl font-bold text-white mb-4">Professionalism</h3>
+            <p class="text-gray-200">We maintain high standards of competence and accountability, continually investing in professional development to serve effectively and ethically.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Focus Areas Section -->
+  <section id="focus" class="py-20">
+    <div class="container mx-auto px-4">
+      <h2 class="text-4xl font-bold text-primary text-center mb-16">Our Areas of Focus</h2>
+      
+      <div class="focus-container">
+        <div class="focus-scroll animate-slide-left animate-pause-hover">
+          <!-- Child Protection -->
+          <div class="focus-item">
+            <div class="focus-card p-6 rounded-lg">
+              <h3 class="text-2xl font-bold text-primary mb-4">Child Protection</h3>
+              <p class="text-gray-700 leading-relaxed">
+                ECEN is dedicated to the protection of children from all forms of abuse, exploitation, and neglect. Through awareness campaigns, advocacy, and direct interventions, the organization works to ensure that children grow up in safe, supportive environments. It collaborates with schools, families, and communities to strengthen child protection systems and safeguard the rights of children.
+              </p>
+            </div>
+          </div>
+
+          <!-- GBV Prevention -->
+          <div class="focus-item">
+            <div class="focus-card p-6 rounded-lg">
+              <h3 class="text-2xl font-bold text-primary mb-4">GBV Prevention and Response</h3>
+              <p class="text-gray-700 leading-relaxed">
+                Gender-based violence is a significant focus area for ECEN. The organization works on both prevention and response efforts by educating communities about the harmful effects of GBV and providing support services for survivors. ECEN implements training programs, develops resource materials, and advocates for stronger policies and laws to prevent GBV and protect survivors. It also provides counseling, legal aid, and shelters for those affected.
+              </p>
+            </div>
+          </div>
+
+          <!-- Governance -->
+          <div class="focus-item">
+            <div class="focus-card p-6 rounded-lg">
+              <h3 class="text-2xl font-bold text-primary mb-4">Governance and Social Justice</h3>
+              <p class="text-gray-700 leading-relaxed">
+                ECEN actively engages in promoting good governance and social justice, advocating for policies that ensure transparency, accountability, and equality. The organization works with local governments and civil society to strengthen democratic processes, including promoting fair elections, citizens' participation, and the rule of law. ECEN's initiatives aim to empower communities to hold leaders accountable and to address issues such as corruption and inequality.
+              </p>
+            </div>
+          </div>
+
+          <!-- HRD Safeguards -->
+          <div class="focus-item">
+            <div class="focus-card p-6 rounded-lg">
+              <h3 class="text-2xl font-bold text-primary mb-4">Human Rights Defenders (HRDs) Safeguards</h3>
+              <p class="text-gray-700 leading-relaxed">
+                ECEN places a strong emphasis on protecting human rights defenders who work on the front lines of social justice, often at great personal risk. The organization provides support for HRDs, ensuring they have access to legal protection, psychosocial support, and safe spaces. By advocating for the rights and safety of HRDs, ECEN contributes to a global movement that recognizes the importance of these individuals in advancing human rights and social justice.
+              </p>
+            </div>
+          </div>
+
+          <!-- Duplicate card for continuous scroll (if needed) -->
+          <div class="focus-item">
+            <div class="focus-card p-6 rounded-lg">
+              <h3 class="text-2xl font-bold text-primary mb-4">Child Protection</h3>
+              <p class="text-gray-700 leading-relaxed">
+                ECEN is dedicated to the protection of children from all forms of abuse, exploitation, and neglect. Through awareness campaigns, advocacy, and direct interventions, the organization works to ensure that children grow up in safe, supportive environments. It collaborates with schools, families, and communities to strengthen child protection systems and safeguard the rights of children.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <footer id="contact" class="bg-gray-900 text-white py-12">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="text-3xl font-bold mb-8">Contact Us</h2>
+      <p class="mb-4">Email: <a href="/cdn-cgi/l/email-protection#0b62656d644b6e686e652564796c" class="text-blue-400 hover:text-blue-300"><span class="__cf_email__" data-cfemail="157c7b737a557076707b3b7a6772">[email&#160;protected]</span></a></p>
+      <p class="text-gray-400 mt-8">2025 Elgon Centre for Empowerment Network (ECEN). All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.carousel-item');
+    
+    function showSlide(index) {
+      slides.forEach(slide => slide.classList.remove('active'));
+      currentSlide = (index + slides.length) % slides.length;
+      slides[currentSlide].classList.add('active');
+    }
+    
+    function nextSlide() {
+      showSlide(currentSlide + 1);
+    }
+    
+    function previousSlide() {
+      showSlide(currentSlide - 1);
+    }
+    
+    // Auto advance slides every 5 seconds
+    setInterval(nextSlide, 5000);
+  </script>
+
+</body>
+</html>

@@ -175,21 +175,43 @@
 </head>
 <body class="font-sans text-gray-800">
 
-  <!-- Navigation (Header floats in from above) -->
-  <nav class="bg-primary sticky top-0 z-50 animate-slideDown">
-    <div class="container mx-auto px-4">
-      <div class="flex justify-between items-center h-16">
-        <a href="#" class="text-white text-2xl font-bold">ECEN</a>
-        <div class="hidden md:flex space-x-8">
-          <a href="#Home" class="text-white hover:text-purple-200 transition">Home</a>
-          <a href="#mission" class="text-white hover:text-purple-200 transition">Mission</a>
-          <a href="#values" class="text-white hover:text-purple-200 transition">Core Values</a>
-          <a href="#focus" class="text-white hover:text-purple-200 transition">Focus Areas</a>
-          <a href="#contact" class="text-white hover:text-purple-200 transition">Contact</a>
-        </div>
+<!-- Navigation (Responsive with Mobile Menu) -->
+<nav class="bg-primary sticky top-0 z-50 animate-slideDown" x-data="{ open: false }">
+  <div class="container mx-auto px-4">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo -->
+      <a href="#" class="text-white text-2xl font-bold">ECEN</a>
+      
+      <!-- Desktop Menu -->
+      <div class="hidden md:flex space-x-8">
+        <a href="#Home" class="text-white hover:text-purple-200 transition">Home</a>
+        <a href="#mission" class="text-white hover:text-purple-200 transition">Mission</a>
+        <a href="#values" class="text-white hover:text-purple-200 transition">Core Values</a>
+        <a href="#focus" class="text-white hover:text-purple-200 transition">Focus Areas</a>
+        <a href="#contact" class="text-white hover:text-purple-200 transition">Contact</a>
       </div>
+      
+      <!-- Mobile Menu Button -->
+      <button class="md:hidden text-white focus:outline-none" @click="open = !open">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+        </svg>
+      </button>
     </div>
-  </nav>
+    
+    <!-- Mobile Menu -->
+    <div x-show="open" @click.away="open = false" class="md:hidden bg-primary text-white py-2 space-y-2 flex flex-col items-end pr-4 absolute right-0 top-16 w-2/3 shadow-lg">
+      <a href="#Home" class="hover:text-purple-200 transition">Home</a>
+      <a href="#mission" class="hover:text-purple-200 transition">Mission</a>
+      <a href="#values" class="hover:text-purple-200 transition">Core Values</a>
+      <a href="#focus" class="hover:text-purple-200 transition">Focus Areas</a>
+      <a href="#contact" class="hover:text-purple-200 transition">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Include Alpine.js for Interactivity -->
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
   <!-- Hero Section with Carousel -->
   <div id="heroCarousel" class="relative">
@@ -205,7 +227,7 @@
       </div>
       <div class="gradient-overlay absolute inset-0"></div>
       <div class="absolute inset-0 flex items-center justify-start">
-        <div class="max-w-2xl px-12 ml-12">
+        <div class="bg-black bg-opacity-50 p-8 rounded-lg max-w-2xl px-12 ml-12">
           <h1 class="text-5xl md:text-6xl font-bold text-white mb-6 animate-slideDown">Empowering Communities</h1>
           <p class="text-xl md:text-2xl text-white mb-8 animate-slideUp">Fostering social change through education, advocacy, and capacity building.</p>
           <div class="space-x-4">
@@ -226,7 +248,7 @@
       </div>
       <div class="gradient-overlay absolute inset-0"></div>
       <div class="absolute inset-0 flex items-center justify-start">
-        <div class="max-w-2xl px-12 ml-12">
+        <div class="bg-black bg-opacity-50 p-8 rounded-lg max-w-2xl px-12 ml-12">
           <h1 class="text-5xl md:text-6xl font-bold text-white mb-6 animate-slideDown">Advocating for Equality</h1>
           <p class="text-xl md:text-2xl text-white mb-8 animate-slideUp">Championing human rights and social justice across communities.</p>
           <div class="space-x-4">
@@ -247,7 +269,7 @@
       </div>
       <div class="gradient-overlay absolute inset-0"></div>
       <div class="absolute inset-0 flex items-center justify-start">
-        <div class="max-w-2xl px-12 ml-12">
+        <div class="bg-black bg-opacity-50 p-8 rounded-lg max-w-2xl px-12 ml-12">
           <h1 class="text-5xl md:text-6xl font-bold text-white mb-6 animate-slideDown">Driving Sustainable Change</h1>
           <p class="text-xl md:text-2xl text-white mb-8 animate-slideUp">Building a future where every voice is heard and every right is protected.</p>
           <div class="space-x-4">
@@ -284,13 +306,18 @@
   </section>
 
   <!-- Core Values Section -->
+
   <section id="values" class="bg-gray-50 py-20">
+    
+
+
+
     <div class="container mx-auto px-4">
       <h2 class="text-4xl font-bold text-primary text-center mb-16">Our Core Values</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" x-data="{ activeCard: null }">
         
         <!-- Gender Sensitivity -->
-        <div class="value-card animate-float">
+        <div class="value-card animate-float group">
           <div class="value-card-bg" style="background-image: url('https://images.pexels.com/photos/7551442/pexels-photo-7551442.jpeg?auto=compress&cs=tinysrgb&w=1600')"></div>
           <div class="value-card-content">
             <h3 class="text-2xl font-bold text-white mb-4">Gender Sensitivity</h3>

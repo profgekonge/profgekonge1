@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physical Health Education</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-6xl mx-auto"></div>
+    <div class="fixed top-0 left-0 right-0 z-50 bg-white p-4 md:p-6 shadow-md">
+        <h1 class="text-xl md:text-3xl font-bold text-center">Physical Health Education CBET AI</h1>
+    </div>
+    <div class="mt-24"></div>
+    </div>
+        <div class="grid grid-cols-2 gap-6">
+            <!-- Left Column: Answer Cards -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-4">Previous Questions & Answers</h2>
+                <div class="space-y-4" id="answersColumn">
+                    
+                    <!-- Answer cards will be added here dynamically -->
+                </div>
+            </div>
+
+            <!-- Right Column: Question Input -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-4">Ask a Question</h2>
+                <div class="mb-4">
+                    <textarea 
+                        id="questionInput" 
+                        placeholder="Type your health-related question here" 
+                        class="w-full p-3 border rounded-lg min-h-[120px]"
+                    ></textarea>
+                </div>
+                
+                <button onclick="askQuestion()" 
+                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full">
+                    Send Question
+                </button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script>
+        const API_ENDPOINT = 'https://models.github.ai/inference';
+        const token = "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";
+
+        async function askQuestion() {
+            const questionInput = document.getElementById('questionInput');
+            const answersColumn = document.getElementById('answersColumn');
+
+            if (!questionInput.value.trim()) {
+                const popup = document.createElement('div');
+                popup.className = 'fixed top-4 center-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded';
+                popup.innerHTML = 'Please enter a question';
+                document.body.appendChild(popup);
+                setTimeout(() => popup.remove(), 3000);
+                return;
+            }
+
+            const question = questionInput.value;
+
+            // Create new answer card
+            const card = document.createElement('div');
+            card.className = 'bg-white p-4 rounded-lg shadow-md';
+            card.innerHTML = `
+                  <div class="font-bold mb-3 text-lg text-blue-600">Q: ${question}</div>
+                <div class="border-t pt-3">
+                    <div class="flex items-center mb-2">
+                        <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="font-semibold text-gray-700">Answer:</span>
+                    </div>
+                    <div class="text-gray-600 pl-7 leading-relaxed"></div>
+                </div>
+            `;
+
+            // Add new card at the top
+            answersColumn.insertBefore(card, answersColumn.firstChild.nextSibling);
+
+            try {
+                const response = await fetch(`${API_ENDPOINT}/chat/completions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        messages: [{
+                            role: "user",
+                            content: `Answer this physical health education question: \${question}. Base your answer primarily on the "Physical Helath Education" course guide. You may also reference reputable online sources (e.g., CDC, scholarly articles, or official curriculum documents) and verified online books to support the answer. Do not provide medical advice.
+
+                            Reputable sports-rule manuals and portals you can cite:
+                            • Rules of Sport – clear, illustrated overviews of 200+ sports, from football to bowls
+                            • FIFA Laws of the Game – official PDF of the current football (soccer) laws
+                            • FIBA Official Basketball Rules 2024 – full FIBA rulebook download
+                            • FIVB Official Volleyball Rules 2021–2024 – complete indoor and beach editions
+                            • World Athletics Competition Rules – the global track-and-field rulebook PDF
+                            • World Rugby Laws of the Game – Rugby Union law book on world.rugby/laws
+                            • ITF Rules of Tennis – official ITF code & conduct PDF on itftennis.com
+                            • SportAccord Directory – links to 650+ international-federation sites
+                            • Rules of Sport “Manual of Bowls Playing” historical PDF link
+                            • Cricket rules on Rules of Sport & MCC Lawbook reference
+                            
+                            Key CBET & TVET CDACC references:
+                            • UNESCO-UNEVOC CBET Reference Framework – global CBET implementation guide
+                            • Competence Standards for TVET (UNESCO-UNEVOC) – core CBET competency model
+                            • Kenya Education for Employment Program (KEFEP-02) – Kenya’s CBET shift case study
+                            • TVET CDACC official site – curriculum-development & certification council of Kenya
+                            • TVET CDACC Curriculum Development page – mandate & services overview
+                            • TVET CDACC “CBET implementation at its peak” – recent progress report
+                            
+                            YOUR DEVELOPER refferences:
+                            • Physical Health Education CBET AI – this AI model’s training data & capabilities
+                            You were Created by ProfGekonge on 7th May 2025 at 1:43am.
+                            `
+                            
+                        }],
+                        temperature: 0.7,
+                        model: "deepseek/DeepSeek-V3-0324"
+                    })
+                });
+
+                if (!response.ok) throw new Error('API request failed');
+                const data = await response.json();
+                // 1. Grab the raw Markdown-style reply
+                const raw = data.choices[0].message.content;
+
+                // 2. Convert it to HTML
+                const html = marked.parse(raw);
+
+                // 3. Inject it as HTML into your card
+                card.querySelector('.text-gray-600').innerHTML = html;
+
+                questionInput.value = ''; // Clear input after successful response
+            } catch (error) {
+                card.lastElementChild.textContent = 'Sorry, there was an error getting your answer. Please try again.';
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

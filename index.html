@@ -1,575 +1,191 @@
-<html><head><base href="." />
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prof Gekonge</title>
-<style>
-:root {
-    --primary: #2d3436;
-    --secondary: #0984e3;
-    --accent: #00cec9;
-    --text: #2d3436;
-    --light: #dfe6e9;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
-
-body {
-    background: var(--light);
-    color: var(--text);
-    line-height: 1.6;
-}
-
-.hero {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
-                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><rect width="800" height="600" fill="%231e1e1e"/><rect x="50" y="40" width="200" height="520" fill="%23252526"/><rect x="270" y="40" width="480" height="520" fill="%23252526"/><text x="290" y="80" fill="%239cdcfe" font-family="monospace" font-size="14">function greeting() {</text><text x="290" y="100" fill="%23ce9178" font-family="monospace" font-size="14">    return "Hello World!";</text><text x="290" y="120" fill="%239cdcfe" font-family="monospace" font-size="14">}</text></svg>');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-.hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(45deg, rgba(45, 52, 54, 0.8) 0%, rgba(9, 132, 227, 0.8) 100%);
-    clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
-    z-index: -1;
-}
-
-.content {
-    text-align: center;
-    color: white;
-    padding: 2rem;
-    animation: fadeIn 1s ease-in;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 15px;
-    backdrop-filter: blur(5px);
-    position: relative;
-    z-index: 1;
-}
-
-.floating-code {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.code-element {
-  position: absolute;
-  color: rgba(255, 255, 255, 0.1);
-  font-family: monospace;
-  font-size: 1.2rem;
-  white-space: nowrap;
-  animation: floatCode 15s linear infinite;
-}
-
-@keyframes floatCode {
-  0% {
-    transform: translateY(100vh) translateX(-50%);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(-100px) translateX(50%);
-    opacity: 0;
-  }
-}
-
-.loader {
-    border: 5px solid var(--light);
-    border-radius: 50%;
-    border-top: 5px solid var(--accent);
-    width: 50px;
-    height: 50px;
-    animation: spin 1s linear infinite;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 2000;
-}
-
-@keyframes spin {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-.loader-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 1999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.profile-image {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    border: 3px solid var(--accent);
-    margin: 0 auto 1.5rem auto;
-    overflow: hidden;
-    position: relative;
-}
-
-.profile-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.profile-image:hover img {
-    transform: scale(1.1);
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal.show {
-    display: flex;
-}
-
-.modal-content {
-    background: white;
-    padding: 2rem;
-    border-radius: 15px;
-    width: 90%;
-    max-width: 500px;
-    position: relative;
-    animation: modalSlide 0.3s ease-out;
-}
-
-.close-modal {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 24px;
-    cursor: pointer;
-    color: var(--primary);
-}
-
-.contact-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.form-group label {
-    color: var(--primary);
-    font-weight: 600;
-}
-
-.form-group input,
-.form-group textarea {
-    padding: 0.8rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-}
-
-.btn {
-    padding: 1rem 2rem;
-    border: none;
-    border-radius: 30px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    background-color: #2ecc71; /* Fresh green color */
-    color: white;
-    box-shadow: 0 6px 0 #27ae60; /* Darker green for depth */
-    transform-style: preserve-3d;
-    transition: all 0.2s ease;
-    text-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-    position: relative;
-}
-
-.btn::before {
-    content: '';
-    position: absolute;
-    top: -4px;
-    left: -4px;
-    right: -4px;
-    bottom: -4px;
-    background: rgba(46, 204, 113, 0.2); /* Lighter green glow */
-    border-radius: 34px;
-    z-index: -1;
-    filter: blur(8px);
-    transition: all 0.2s ease;
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 0 #27ae60;
-    background-color: #27ae60;
-}
-
-.btn:hover::before {
-    filter: blur(12px);
-}
-
-.btn:active {
-    transform: translateY(4px);
-    box-shadow: 0 2px 0 #27ae60;
-}
-
-.submit-btn {
-    background-color: #2ecc71;
-    box-shadow: 0 6px 0 #27ae60;
-    color: white;
-    padding: 1rem;
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.2s ease;
-    text-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-}
-
-.submit-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 0 #27ae60;
-    background-color: #27ae60;
-}
-
-.submit-btn:active {
-    transform: translateY(4px);
-    box-shadow: 0 2px 0 #27ae60;
-}
-
-.table-control {
-  margin: 0 0.5rem;
-  padding: 0.5rem 1rem !important;
-  font-size: 0.9rem !important;
-  background-color: #2ecc71 !important;
-  box-shadow: 0 4px 0 #27ae60 !important;
-}
-
-.table-control:hover {
-    background-color: #27ae60 !important;
-}
-
-.table-control.active {
-    background-color: #27ae60 !important;
-    box-shadow: 0 2px 0 #219a52 !important;
-    transform: translateY(2px);
-}
-
-h1 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    position: relative;
-}
-
-h1::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 50px;
-    height: 3px;
-    background: var(--accent);
-}
-
-p {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-}
-
-#dynamicText {
-    transition: opacity 0.5s ease;
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-}
-
-.cta-buttons {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-}
-
-.social-links {
-    margin-top: 2rem;
-    display: flex;
-    gap: 1.5rem;
-}
-
-.social-icon {
-    width: 40px;
-    height: 40px;
-    fill: white;
-    transition: transform 0.3s ease;
-}
-
-.social-icon:hover {
-    transform: scale(1.2);
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes modalSlide {
-    from {
-        opacity: 0;
-        transform: translateY(-50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.projects-toggle-container {
-  margin-top: 1rem;
-}
-
-.projects-modal {
-  max-width: 90%;
-  width: 1200px;
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
-@media (max-width: 768px) {
-  .projects-modal {
-    width: 95%;
-  }
-  
-  .projects-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-}
-
-.projects-section {
-  display: none;
-}
-
-.projects-container {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.projects-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    margin-top: 2rem;
-}
-
-.project-table {
-    perspective: 1000px;
-    transition: transform 0.6s;
-    transform-style: preserve-3d;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-}
-
-.project-table.hidden {
-    display: none;
-}
-
-.project-table h2 {
-    background: var(--primary);
-    color: white;
-    padding: 1rem;
-    margin: 0;
-    text-align: center;
-}
-
-.project-table table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.project-table th,
-.project-table td {
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 1px solid #eee;
-}
-
-.project-table th {
-    background: var(--light);
-    font-weight: 600;
-}
-
-.project-table tr:hover {
-    background: #f5f5f5;
-}
-
-.project-status {
-    padding: 0.25rem 0.75rem;
-    border-radius: 15px;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.status-in-progress {
-    background: #ffeaa7;
-    color: #b7791f;
-}
-
-.status-completed {
-    background: #c6f6d5;
-    color: #2f855a;
-}
-
-.project-table.flip-out {
-    animation: flipOut 0.3s ease-out forwards;
-}
-
-.project-table.flip-in {
-    animation: flipIn 0.3s ease-out forwards;
-}
-
-@keyframes flipOut {
-    0% {
-        transform: rotateX(0deg);
-        opacity: 1;
-    }
-    100% {
-        transform: rotateX(-90deg);
-        opacity: 0;
-    }
-}
-
-@keyframes flipIn {
-    0% {
-        transform: rotateX(90deg);
-        opacity: 0;
-    }
-    100% {
-        transform: rotateX(0deg);
-        opacity: 1;
-    }
-}
-
-.hover-green {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="." />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Full Stack Developer Portfolio of Prof. Gekonge - Expert in web development, AI, and creative solutions. View my projects and skills.">
+    <meta name="keywords" content="Full Stack Developer, Web Development, AI, Creative Developer, Prof. Fidelis Gekonge">
+    <meta name="author" content="Prof. Fidelis Gekonge">
+    <meta property="og:title" content="Prof. Gekonge - Full Stack Developer Portfolio">
+    <meta property="og:description" content="Experienced Full Stack Developer specialized in creating innovative digital solutions">
+    <meta property="og:image" content="https://lh3.googleusercontent.com/pw/AP1GczOA1Ey6BgQK8b5OAWqBY1Evosp8xxNSpp8IZWmsxoInMuJ8c1-to2BNeqfZbtJQncgWAxxtswNP8sz7XdgoPWAzmSTfmehghRHQ5zS4cliteBLQFak=w2400">
+    <meta name="twitter:card" content="summary_large_image">
+    <title>Prof. Gekonge – Full Stack Developer | Creative Solutions</title>
     
-    transition: color 0.3s ease; /* Smooth transition */
-}
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="static/css/effects.css" rel="stylesheet">
+    <link rel="preconnect" href="https://js.paystack.co">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="theme-color" content="#2196F3">    <style>
+        /* Base styles */
+        body { 
+            overflow-x: hidden;
+        }
+        
+        /* Loader animation */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+        
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #3b82f6;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Hide loader after page load */
+        .loader-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
 
-.hover-green:hover {
-    color: green; /* Color on hover */
-}
+        /* Modal styles */
+        .modal {
+            opacity: 0;
+            visibility: hidden;
+            display: flex !important;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
 
-.flex {
-    display: flex;
-    justify-content: center;
-    align-items: center; /* Aligns items vertically */
-    gap: 10px; /* Adds space between elements */
-    font-family: Arial, sans-serif; /* Sets the font */
-    font-size: 18px;
-}
-
-#dynamicText {
-    font-weight: bold; /* Makes the text bold */
-    color: #007BFF; /* Sets the text color */
-}
-
-</style>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
 </head>
 <body>
     <!-- Loader -->
     <div class="loader-overlay" id="loaderOverlay">
         <div class="loader"></div>
-    </div>
-
-    <div class="hero">
-        <div class="floating-code" id="floatingCode"></div>
-        <div class="content">
-            <div class="profile-image">
-                <img src="https://lh3.googleusercontent.com/pw/AP1GczOA1Ey6BgQK8b5OAWqBY1Evosp8xxNSpp8IZWmsxoInMuJ8c1-to2BNeqfZbtJQncgWAxxtswNP8sz7XdgoPWAzmSTfmehghRHQ5zS4cliteBLQFak=w2400" 
-                     alt="Fidelis Gekonge" 
-                     class="rotating-image">
-            </div>
-            
-            
-            <h1 class="hover-green">Hi, I’m <br> Prof. Gekonge</h1>
-            <div class="flex">
-                <p>I am a:</p></p><p id="dynamicText">Creative Developer</p>
-            </div>
-                
-                <div class="cta-buttons">
-                    <a href="https://sites.google.com/view/profgekonge1/home" class="btn btn-primary">About Me</a>
-                    <button class="btn btn-secondary" onclick="openModal()">Contact Me</button>
+    </div>    <section class="min-h-screen relative flex items-center justify-center bg-gradient-to-b from-gray-900 to-gray-800 overflow-hidden">        
+        <div id="floatingCode" class="floating-code absolute inset-0 pointer-events-none"></div>
+        <div id="cursor-gradient" class="pointer-events-none fixed w-[600px] h-[600px] rounded-full opacity-0 transition-all duration-150 ease-out bg-[radial-gradient(ellipse_at_center,rgba(29,78,216,0.2)_0%,rgba(20,184,166,0.15)_25%,transparent_80%)] blur-lg transform -translate-x-1/2 -translate-y-1/2 will-change-transform"></div>
+        <div class="relative z-10 max-w-5xl mx-auto px-6 sm:px-8 lg:px-10 py-20 text-center">
+            <div class="mb-12">
+            <div class="relative inline-block group">
+                    <img src="https://lh3.googleusercontent.com/pw/AP1GczOA1Ey6BgQK8b5OAWqBY1Evosp8xxNSpp8IZWmsxoInMuJ8c1-to2BNeqfZbtJQncgWAxxtswNP8sz7XdgoPWAzmSTfmehghRHQ5zS4cliteBLQFak=w2400" 
+                         alt="Fidelis Gekonge" 
+                         class="w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-blue-500 object-cover transform hover:scale-105 transition-transform duration-300">
+                    <div class="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 to-teal-400 opacity-0 hover:opacity-20 transition-opacity duration-300"></div>
                 </div>
-            <div class="projects-toggle-container">
-                <button class="btn btn-secondary" onclick="toggleProjects()">View Projects</button>
             </div>
+            <div class="space-y-6">
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 animate-fade-in">
+                    Hi, I'm 
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-teal-400 animate-gradient animate-pulse">
+                        Fidelis Gekonge</span>
+                        <span class="block text-lg sm:text-xl font-semibold text-blue-300 mt-2 opacity-0 animate-slide-up"></span>
+                        
+                    </span>
+                    <p class="text-gray-400 text-lg italic">(aka Prof. Gekonge)</p>
+                </h1>
+
+                <p class="text-gray-300 text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed backdrop-blur-sm bg-black/10 p-4 rounded-lg transform hover:scale-105 transition-all duration-300">
+                    A Full Stack Developer crafting innovative digital experiences. 
+                    Specializing in <span class="text-blue-400">web development</span>, 
+                    <span class="text-purple-400">AI</span>, and 
+                    <span class="text-teal-400">creative solutions</span> that empower communities.
+                </p>
+
+                <!-- Skills Section
+                <div class="mt-12 max-w-3xl mx-auto">
+                    <h2 class="text-2xl font-bold text-white mb-8">Technical Skills</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-white">Frontend Development</span>
+                                    <span class="text-blue-400">70%</span>
+                                </div>
+                                <div class="h-2 bg-gray-700 rounded-full">
+                                    <div class="skill-progress h-full bg-gradient-to-r from-blue-500 to-teal-400 rounded-full" style="width: 95%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-white">Backend Development</span>
+                                    <span class="text-blue-400">50%</span>
+                                </div>
+                                <div class="h-2 bg-gray-700 rounded-full">
+                                    <div class="skill-progress h-full bg-gradient-to-r from-blue-500 to-teal-400 rounded-full" style="width: 90%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-white">AI/Machine Learning</span>
+                                    <span class="text-blue-400">60%</span>
+                                </div>
+                                <div class="h-2 bg-gray-700 rounded-full">
+                                    <div class="skill-progress h-full bg-gradient-to-r from-blue-500 to-teal-400 rounded-full" style="width: 85%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-white">Database Design</span>
+                                    <span class="text-blue-400">50%</span>
+                                </div>
+                                <div class="h-2 bg-gray-700 rounded-full">
+                                    <div class="skill-progress h-full bg-gradient-to-r from-blue-500 to-teal-400 rounded-full" style="width: 88%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-white">DevOps</span>
+                                    <span class="text-blue-400">60%</span>
+                                </div>
+                                <div class="h-2 bg-gray-700 rounded-full">
+                                    <div class="skill-progress h-full bg-gradient-to-r from-blue-500 to-teal-400 rounded-full" style="width: 82%"></div>
+                                </div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-white">UI/UX Design</span>
+                                    <span class="text-blue-400">85%</span>
+                                </div>
+                                <div class="h-2 bg-gray-700 rounded-full">
+                                    <div class="skill-progress h-full bg-gradient-to-r from-blue-500 to-teal-400 rounded-full" style="width: 85%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
                 <div class="social-links">
                     <!-- GitHub Icon -->
-                    <a href="https://github.com/profgekonge">
+                    <a href="https://github.com/profgekonge" target="_blank" rel="noopener noreferrer">
                         <svg class="social-icon" viewBox="0 0 24 24">
                             <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                         </svg>
                     </a>
                     <!-- LinkedIn Icon -->
-                    <a href="https://www.linkedin.com/in/fidelis-gekonge-12126b310/">
+                    <a href="https://www.linkedin.com/in/fidelis-gekonge-12126b310/" target="_blank" rel="noopener noreferrer">
                         <svg class="social-icon" viewBox="0 0 24 24">
                             <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
                         </svg>
                     </a>
                     <!-- Twitter Icon -->
                    <!-- Twitter Icon -->
-                    <a href="https://twitter.com/profgekonge">
+                    <a href="https://twitter.com/profgekonge" target="_blank" rel="noopener noreferrer">
                         <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                             <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/>
                         </svg>
@@ -577,328 +193,160 @@ p {
 
 
                 </div>
-        </div>
-    </div>
+                <div class="mt-8 relative">
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-teal-600 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt"></div>
+                    <div class="relative px-7 py-4 bg-black rounded-lg">
+                        <span class="inline-block bg-gradient-to-r from-blue-600 to-teal-600 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-300">
+                            Founder, Vumakua Startup
+                        </span>
+                        <span class="block text-teal-300 mt-2 text-base font-light">
+                            Empowering Unity Through Technology
+                        </span>
+                    </div>
+                </div>
 
-    <!-- Modal for Projects -->
-    <div class="modal" id="projectsModal">
-      <div class="modal-content projects-modal">
-        <span class="close-modal" onclick="closeProjectsModal()">&times;</span>
-        <div class="projects-container">
-          
-            <button class="btn btn-primary table-control" onclick="switchView('current')">Current Projects</button>
-            <button class="btn btn-primary table-control" onclick="switchView('deployed')">Deployed Projects</button>
+                <div class="mt-8 space-y-2">
+                    <p class="text-gray-400 font-medium">I am a:</p>
+                    <p id="dynamicText" class="text-2xl text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-400 font-bold"></p>
+                </div>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">                    <button 
+                        onclick="toggleProjectsModal()"
+                        class="group liquid-button px-8 py-3 bg-blue-500 text-white rounded-full
+                               transition-all duration-300 transform hover:scale-105 hover:shadow-lg
+                               flex items-center space-x-2 relative overflow-hidden">
+                        <span class="relative z-10">View Projects</span>
+                        <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform relative z-10" 
+                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                    </button>
+                    <button
+                        onclick="toggleBuyCoffeeModal()"
+                        class="group liquid-button px-8 py-3 bg-gradient-to-r from-teal-400 to-blue-500 text-white rounded-full
+                               transition-all duration-300 transform hover:scale-105 hover:shadow-lg 
+                               flex items-center space-x-2 relative overflow-hidden">
+                        <span>Book An Appointment</span>
+                        <span class="text-xl group-hover:rotate-12 transition-transform inline-block">☕</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>    <!-- Modal for Projects -->
+    <div class="fixed inset-0 z-50 modal bg-black bg-opacity-50 items-center justify-center" id="projectsModal">
+      <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto relative transform transition-all duration-300 ease-in-out">
+        <div class="p-6">
+          <span class="absolute top-4 right-4 text-2xl cursor-pointer hover:text-gray-700" onclick="closeProjectsModal()">&times;</span>          <div class="flex flex-wrap gap-4 justify-center mb-6">
+            <button class="liquid-button px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors duration-200 table-control relative overflow-hidden" onclick="switchView('current')">
+              <span class="relative z-10">Current Projects</span>
+            </button>
+            <button class="liquid-button px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors duration-200 table-control relative overflow-hidden" onclick="switchView('deployed')">
+              <span class="relative z-10">Deployed Projects</span>
+            </button>
           </div>
-          <div class="projects-grid">
-            <!-- Current Projects Table -->
+          <div class="projects-grid">            <!-- Current Projects Section -->
             <div class="project-table">
-              <h2>Current Projects</h2>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Project Name</th>
-                    <th>Description</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody >
-                    <h1>In Progress</h1>
-                <!-- <tbody id="currentProjectsBody"> -->
-                  <!-- Projects will be loaded dynamically -->
-                </tbody>
-              </table>
+              <h2 class="text-2xl font-bold text-gray-800 mb-6">Current Projects</h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="currentProjectsBody">
+                <!-- Projects will be loaded dynamically -->
+              </div>
             </div>
 
-            <!-- Deployed Projects Table -->
+            <!-- Deployed Projects Section -->
             <div class="project-table">
-              <h2>Deployed Projects</h2>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Project Name</th>
-                    <th>Description</th>
-                    <th>Link</th>
-                  </tr>
-                </thead>
-                <tbody id="deployedProjectsBody">
-                    <h1>In Progress</h1>
-                        <tr>
-                            <td>PHE AI</td>
-                            <td>Physical Health Education AI</td>
-                            <td><a href="new.html">View</a></td>
-                        </tr>
-                        <tr>
-                            <td>Soccer Team Analysis</td>
-                            <td>Do Comparison of two teams</td>
-                            <td><a href="soccer.html">View</a></td>
-                        </tr>
-                        <tr>
-                            <td>ECEN</td>
-                            <td>Design Template</td>
-                            <td><a href="me_p_ecen.html">View</a></td>
-                        </tr>
-                        <tr>
-                            <td>Skynas-m-beats</td>
-                            <td>Media Group</td>
-                            <td><a href="skynet.html">View</a></td>
-                        </tr>
-                        <tr>
-                            <td>Checkers Game</td>
-                            <td>Simple Game</td>
-                            <td><a href="Game%20Template/game_home.html">View</a></td>
-                        </tr>
-                <!-- <tbody id="deployedProjectsBody"> -->
-                  <!-- Projects will be loaded dynamically -->
-                </tbody>
-              </table>
+              <h2 class="text-2xl font-bold text-gray-800 mb-6">Deployed Projects</h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="deployedProjectsBody">
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-800">PHE AI</h3>
+                        <p class="text-gray-600 mt-2">Physical Health Education AI</p>
+                        <a href="new.html" target="_blank" rel="noopener" class="mt-4 inline-block px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors duration-200">View Project</a>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-800">Soccer Team Analysis</h3>
+                        <p class="text-gray-600 mt-2">Do Comparison of two teams</p>
+                        <a href="soccer.html" target="_blank" rel="noopener" class="mt-4 inline-block px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors duration-200">View Project</a>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-800">ECEN</h3>
+                        <p class="text-gray-600 mt-2">Design Template</p>
+                        <a href="me_p_ecen.html" target="_blank" rel="noopener" class="mt-4 inline-block px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors duration-200">View Project</a>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-800">Skynas-m-beats</h3>
+                        <p class="text-gray-600 mt-2">Media Group</p>
+                        <a href="skynet.html" target="_blank" rel="noopener" class="mt-4 inline-block px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors duration-200">View Project</a>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-800">Checkers Game</h3>
+                        <p class="text-gray-600 mt-2">Simple Game</p>
+                        <a href="Game%20Template/game_home.html" target="_blank" rel="noopener"  class="mt-4 inline-block px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors duration-200">View Project</a>
+                    </div>
+                </div>              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Modal -->
-    <div class="modal" id="contactModal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal()">&times;</span>
-            
-            <h2 class="text-xl font-semibold mb-4">To contact me buy Coffee</h2>
-            <form id="paymentForm" class="contact-form space-y-4">
-                <div class="form-group">
+    </div>    <!-- Contact Modal (Buy me a Coffee) -->
+    <div class="fixed inset-0 z-50 modal bg-black bg-opacity-50 items-center justify-center" id="contactModal">
+        <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-md p-6 relative transform transition-all duration-300 ease-in-out">
+            <span class="absolute top-4 right-4 text-2xl cursor-pointer hover:text-gray-700" onclick="closeBuyCoffeeModal()">&times;</span>
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Buy me a Coffee ☕</h2>
+                <p class="text-gray-600 mt-2">Support my work and let's connect!</p>
+            </div>
+            <form id="paymentForm" class="space-y-6" onsubmit="event.preventDefault(); payWithPaystack();">
+                <div>
                     <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                    <input type="email" id="email" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                    <input type="email" id="email" name="email" required class="mt-1 block w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
-                <div class="form-group">
-                    <label for="amount" class="block text-sm font-medium text-gray-700">Amount (KES)</label>
-                    <input type="number" id="amount" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                <div>
+                    <label for="amount" class="block text-sm font-medium text-gray-700">Amount</label>
+                    <select id="amount" name="amount" required class="mt-1 block w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <option value="">Select an amount</option>
+                        <option value="500">Regular Coffee ☕ (KSh 500)</option>
+                        <option value="1000">Double Shot ☕☕ (KSh 1000)</option>
+                        <option value="1500">Premium Blend ☕☕☕ (KSh 1500)</option>
+                    </select>
                 </div>
-                <div class="form-group"></div>
-                    <button type="button" onclick="payWithPaystack()" class="submit-btn">Buy Coffee</button>
+                <div>
+                    <button type="submit" id="payButton" class="w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all duration-300 flex items-center justify-center space-x-2">
+                        <span>Proceed to Payment</span>
+                        <svg class="w-5 h-5 hidden" id="paymentSpinner" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                    </button>
                 </div>
             </form>
         </div>
     </div>
+
+    <!-- External Dependencies -->
     <script src="https://js.paystack.co/v2/inline.js"></script>
+    
+    <!-- Application Scripts -->
+    <script src="static/js/app.js"></script>
+    <script src="static/js/modal.js"></script>
+    <script src="static/js/payment.js"></script>    <!-- Initialize the application -->
     <script>
-        
-        function payWithPaystack() {
-            const email = document.getElementById('email').value;
-            const amount = document.getElementById('amount').value * 100;
-
-            let handler = PaystackPop.setup({
-                key: 'pk_live_8a364e85699350340d7651891a6d8afe5f922957', // Replace with your public key
-                email: email,
-                amount: amount,
-                currency: 'KES',
-                ref: '' + Math.floor((Math.random() * 1000000000) + 1),
-                
-                onClose: function(){
-                    alert('Payment window closed.');
-                },
-                callback: function(response){
-                    alert('Payment complete! Reference: ' + response.reference);
-                    window.location.href = "/success-page.html?reference=" + response.reference;
-                }
-            });
-
-            handler.openIframe();
-        }
-
-        function openModal() {
-            document.getElementById('contactModal').classList.add('show');
-        }
-
-        function closeModal() {
-            document.getElementById('contactModal').classList.remove('show');
-        }
-
-        function showLoader() {
-            document.getElementById('loaderOverlay').style.display = 'flex';
-        }
-
-        function hideLoader() {
-            document.getElementById('loaderOverlay').style.display = 'none';
-        }
-
-        function handleSubmit(event) {
-            event.preventDefault();
-            showLoader();
-            
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const message = document.getElementById('message').value;
-            
-            // Simulate form submission
+        document.addEventListener('DOMContentLoaded', () => {
+            // Hide loader after page loads
             setTimeout(() => {
-                hideLoader();
-                alert('Thank you for your message!' + name + ' I will get back to you soon.');
-                closeModal();
-                event.target.reset();
-            }, 1500);
-        }
+                document.getElementById('loaderOverlay').classList.add('hidden');
+            }, 1000);
 
-        
-
-        function toggleProjects() {
-          document.getElementById('projectsModal').classList.add('show');
-          loadProjects();
-        }
-
-        function closeProjectsModal() {
-          document.getElementById('projectsModal').classList.remove('show');
-        }
-
-        function loadProjects() {
-          const currentProjectsBody = document.getElementById('currentProjectsBody');
-          const deployedProjectsBody = document.getElementById('deployedProjectsBody');
-          
-          currentProjectsBody.innerHTML = currentProjects.map(project => `
-            <tr>
-              <td>${project.name}</td>
-              <td>${project.description}</td>
-              <td><span class="project-status status-in-progress">${project.status}</span></td>
-            </tr>
-          `).join('');
-          
-          deployedProjectsBody.innerHTML = deployedProjects.map(project => `
-            <tr>
-              <td>${project.name}</td>
-              <td>${project.description}</td>
-              <td><a href="${project.link}" class="btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.9rem;">View Live</a></td>
-            </tr>
-          `).join('');
-        }
-
-        function initDynamicText() {
-          const phrases = [
-            "Creative Developer",
-            "Creative Designer",
-            "Data Analysit",
-            "Mathematician (Bsc. Applied Maths)",
-          ];
-          let currentIndex = 0;
-          const textElement = document.getElementById('dynamicText');
-          
-          setInterval(() => {
-            textElement.style.opacity = 0;
-            setTimeout(() => {
-              currentIndex = (currentIndex + 1) % phrases.length;
-              textElement.textContent = phrases[currentIndex];
-              textElement.style.opacity = 1;
-            }, 500);
-          }, 3000);
-        }
-
-        function switchView(view) {
-            const currentTable = document.querySelector('.project-table:nth-child(1)');
-            const deployedTable = document.querySelector('.project-table:nth-child(2)');
-            const controls = document.querySelectorAll('.table-control');
-            
-            controls.forEach(control => control.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Add flip out animation
-            [currentTable, deployedTable].forEach(table => {
-                if (table.style.display !== 'none') {
-                    table.classList.add('flip-out');
-                }
-            });
-            
-            // Wait for flip out animation to complete
-            setTimeout(() => {
-                switch(view) {
-                    case 'all':
-                        currentTable.style.display = 'block';
-                        deployedTable.style.display = 'block';
-                        break;
-                    case 'current':
-                        currentTable.style.display = 'block';
-                        deployedTable.style.display = 'none';
-                        break;
-                    case 'deployed':
-                        currentTable.style.display = 'none';
-                        deployedTable.style.display = 'block';
-                        break;
-                }
-                
-                // Add flip in animation
-                [currentTable, deployedTable].forEach(table => {
-                    if (table.style.display !== 'none') {
-                        table.classList.remove('flip-out');
-                        table.classList.add('flip-in');
-                        setTimeout(() => table.classList.remove('flip-in'), 300);
-                    }
-                });
-            }, 300);
-        }
-
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                document.getElementById('loaderOverlay').style.display = 'none';
-                createFloatingCode();
-                initDynamicText(); // Initialize dynamic text
-            }, 1500);
+            // Initialize components
+            initializeCursorEffect();
+            initializeFloatingCode();
+            initializeTypingEffect();
         });
-
-        // Close modal if clicking outside
-        window.onclick = function(event) {
-            const contactModal = document.getElementById('contactModal');
-            const projectsModal = document.getElementById('projectsModal');
-            if (event.target === contactModal) {
-                closeModal();
-            }
-            if (event.target === projectsModal) {
-                closeProjectsModal();
-            }
-        }
-
-        function createFloatingCode() {
-            const codeSnippets = [
-                'function hello() { }',
-                'const data = [];',
-                'let x = 42;',
-                'if (true) { }',
-                'while (active) { }',
-                'class Component { }',
-                'export default app;',
-                'import React from "react";',
-                'const API_KEY = "*****";',
-                '<div className="">',
-                'addEventListener()',
-                'console.log("Debug");',
-                'npm install',
-                'git commit -m "fix"',
-                'docker build .',
-                'async/await',
-                'try { } catch { }',
-            ];
-
-            const container = document.getElementById('floatingCode');
-            
-            function createCodeElement() {
-                const element = document.createElement('div');
-                element.className = 'code-element';
-                element.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
-                element.style.left = Math.random() * 100 + 'vw';
-                element.style.animationDuration = (10 + Math.random() * 15) + 's';
-                element.style.opacity = 0;
-                
-                container.appendChild(element);
-                
-                // Remove element after animation completes
-                setTimeout(() => {
-                    element.remove();
-                }, 25000);
-            }
-
-            // Create initial batch of elements
-            for (let i = 0; i < 10; i++) {
-                setTimeout(createCodeElement, i * 1000);
-            }
-
-            // Continue creating new elements periodically
-            setInterval(createCodeElement, 2000);
-        }
     </script>
 </body>
 </html>

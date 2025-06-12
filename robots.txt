@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /Game Template/game_bin/
+Sitemap: https://profgekonge1.github.io/sitemap.xml
